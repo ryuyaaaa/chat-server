@@ -2,25 +2,25 @@ var express = require('express');
 var router = express.Router();
 var app = require('./../app');
 
-/*--- /api/usersにGETアクションでアクセスしたときの設定 ---*/
+/*--- /api/roomsにGETアクションでアクセスしたときの設定 ---*/
 router.get('/', function(req, res) {
     res.json({
-        message:'users/get'
+        message:'rooms/get'
     });
 });
 
-/*--- /api/users/signupにPOSTアクションでアクセスしたときの設定 ---*/
-router.post('/signup', function(req, res) {
+/*--- /api/rooms/にPOSTアクションでアクセスしたときの設定 ---*/
+router.post('/', function(req, res) {
 
-    var sql = 'select * from chatdb.users where uid = ?';
-    app.connection.query(sql, req.body.uid, function (error, results, fields) {
+    var sql = 'select * from chatdb.rooms where from_id = ? and to_id = ?';
+    app.connection.query(sql, [req.body.from_id, req.body.to_id], function (error, results, fields) {
         
         if (results == '') {
-            console.log('新規登録可能');
+            console.log('新規追加可能');
 
-            // 新規登録可能であるとき
-            sql = 'insert into chatdb.users set ?';
-            var data = {uid:req.body.uid, email:req.body.email, password:req.body.password};
+            // 新規追加可能であるとき
+            sql = 'insert into chatdb.rooms set ?';
+            var data = {from_id:req.body.from_id, to_id:req.body.to_id};
             app.connection.query(sql, data, function(error, results, fields) {
 
                 if (error) {
@@ -28,12 +28,12 @@ router.post('/signup', function(req, res) {
 
                     var param = {"値":"POSTメソッドのリクエストに失敗しました"};
                     res.header('Content-Type', 'application/json; charset=utf-8')
-                        .status(422)
+                        .status(503)
                         .send(param);
                     console.log(req.body);
                 } else {
                     console.log('通信が成功しました');
-                    var param = {"uid":req.body.uid};
+                    var param = {"from_id":req.body.from_id, "to_id":req.body.to_id};
                     res.header('Content-Type', 'application/json; charset=utf-8')
                         .status(200)
                         .send(param);
@@ -42,19 +42,19 @@ router.post('/signup', function(req, res) {
             });
 
         } else {
-            console.log('uidが既に存在');
+            console.log('ルームが既に存在');
             console.log(results);
 
             var param = {"値":"POSTメソッドのリクエストに失敗しました"};
             res.header('Content-Type', 'application/json; charset=utf-8')
-                .status(422)
+                .status(400)
                 .send(param);
             console.log(req.body);
         }
     });
 });
 
-/*--- /api/users/loginにPOSTアクションでアクセスしたときの設定 ---*/
+/*--- /api/users/loginにGETアクションでアクセスしたときの設定 ---*/
 router.post('/login', function(req, res) {
 
     var sql = 'select * from chatdb.users where email = ? and password = ?';
