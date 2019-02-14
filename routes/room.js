@@ -4,8 +4,12 @@ var app = require('./../app');
 
 /*--- /api/roomsにGETアクションでアクセスしたときの設定 ---*/
 router.get('/', function(req, res) {
-    res.json({
-        message:'rooms/get'
+
+    var sql = 'select * from chatdb.rooms where from_id = ?';
+    app.connection.query(sql, req.body.uid, function (error, results, fields) {
+        
+        console.log(results);
+        
     });
 });
 
@@ -48,35 +52,6 @@ router.post('/', function(req, res) {
             var param = {"値":"POSTメソッドのリクエストに失敗しました"};
             res.header('Content-Type', 'application/json; charset=utf-8')
                 .status(400)
-                .send(param);
-            console.log(req.body);
-        }
-    });
-});
-
-/*--- /api/users/loginにGETアクションでアクセスしたときの設定 ---*/
-router.post('/login', function(req, res) {
-
-    var sql = 'select * from chatdb.users where email = ? and password = ?';
-    app.connection.query(sql, [req.body.email, req.body.password], function (error, results, fields) {
-        
-        if (results == '') {
-            console.log('データが存在しません');
-
-            var param = {"値":"POSTメソッドのリクエストに失敗しました"};
-            res.header('Content-Type', 'application/json; charset=utf-8')
-                .status(401)
-                .send(param);
-            console.log(req.body);
-
-        } else {
-            // ログイン可能
-            console.log('ログイン可能');
-            console.log(results);
-
-            var param = {"値":"POSTメソッドのリクエストに成功しました"};
-            res.header('Content-Type', 'application/json; charset=utf-8')
-                .status(200)
                 .send(param);
             console.log(req.body);
         }
