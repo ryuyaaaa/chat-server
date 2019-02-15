@@ -29,9 +29,9 @@ router.get('/', function(req, res) {
 });
 
 /*--- /api/usersにPATCHアクションでアクセスしたときの設定 ---*/
-router.patch('/', function(req, res) {
+router.put('/', function(req, res) {
     
-    var sql = 'update users set name = ? comment = ? where id = ?';
+    var sql = 'update users set name = ?, comment = ? where uid = ?';
     app.connection.query(sql, [req.body.name, req.body.comment, req.header('Uid')], function (error, results, fields) {
         
         if (error) {
